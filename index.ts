@@ -118,7 +118,7 @@ async function getExplanation(input: string, question: string) {
     const { content } = response.choices[0]?.message;
 
     return content;
-  } catch (error) {
+  } catch (error: any) {
     if (error.response) {
       console.log(error.response.status); // e.g. 401
       console.log(error.response.data.message); // e.g. The authentication token you passed was invalid...
