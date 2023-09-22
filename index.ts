@@ -2,11 +2,12 @@
 const MAX_PER_QUERY = 100;
 const PAUSE = 30 * 1000;
 const PROMPT =
-  'Is this article about or related with artificial intelligence (AI), machine learning (ML), or large languag models (LLM)? Just reply "true" or "false" answer';
+  'Is this abstract discussing a machine learning (ML), or large language models (LLMs) technique? Just answer "true" or "false".';
 
 // Start code from here
 import data from './data.json';
 import OpenAI from 'openai';
+import chalk from 'chalk';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -46,9 +47,11 @@ for (let i = 0; i < totPapers / MAX_PER_QUERY; i++) {
   const max = tempMax < totPapers ? tempMax : totPapers;
 
   console.log(
-    `Analyzing papers from ${min}[id: ${papers[min].id}] to ${max - 1}[id: ${
-      papers[max - 1].id
-    }]`
+    chalk.green(
+      `Analyzing papers from ${min} [id: ${papers[min].id}] to ${
+        max - 1
+      } [id: ${papers[max - 1].id}]`
+    )
   );
 
   const annotateWitQuestion = await Promise.all(
@@ -63,7 +66,7 @@ for (let i = 0; i < totPapers / MAX_PER_QUERY; i++) {
     })
   );
   result.push(...annotateWitQuestion);
-  console.log('Waiting...');
+  console.log(chalk.bgGreen('Waiting (free OpenAI account, ok??)...'));
   await delay(PAUSE);
 }
 
@@ -78,8 +81,11 @@ const matchQuery = result.filter((paper) => paper.matchQuery === 'true');
 
 const perc = ((100 * matchQuery.length) / result.length).toFixed(1);
 console.log(
-  `${matchQuery.length} papers out of ${result.length} matched the query (${perc}%)`
+  chalk.red(
+    `${matchQuery.length} papers out of ${result.length} (${perc}%) matched the query:`
+  )
 );
+console.log(chalk.magenta(PROMPT));
 
 // Helpers
 async function getExplanation(input: string, question: string) {
