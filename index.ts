@@ -1,8 +1,8 @@
 // Constants
-const MAX_PER_QUERY = 100;
+const MAX_SIMULTANEOUS_QUERIES = 100;
 const PAUSE = 30 * 1000;
 const PROMPT =
-  'Is this abstract discussing a machine learning (ML), or large language models (LLMs) technique? Just answer "true" or "false".';
+  'Is this paper discussing or using a machine learning (ML), or large language models (LLMs) techniques? Give a conservative answer to minimize false positives. Simply answer "true" or "false".';
 
 // Start code from here
 import data from './data.json';
@@ -41,9 +41,9 @@ const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
 const result: any = [];
 
-for (let i = 0; i < totPapers / MAX_PER_QUERY; i++) {
-  const min = i * MAX_PER_QUERY;
-  const tempMax = (i + 1) * MAX_PER_QUERY;
+for (let i = 0; i < totPapers / MAX_SIMULTANEOUS_QUERIES; i++) {
+  const min = i * MAX_SIMULTANEOUS_QUERIES;
+  const tempMax = (i + 1) * MAX_SIMULTANEOUS_QUERIES;
   const max = tempMax < totPapers ? tempMax : totPapers;
 
   console.log(
@@ -56,7 +56,9 @@ for (let i = 0; i < totPapers / MAX_PER_QUERY; i++) {
 
   const annotateWitQuestion = await Promise.all(
     papers.slice(min, max).map(async ({ id, title, abstract }) => {
-      const answer = await getExplanation(abstract, PROMPT);
+      const question = `Title: ${title}\nAbstract:${abstract}`;
+
+      const answer = await getExplanation(question, PROMPT);
       return {
         id,
         title,
@@ -105,8 +107,8 @@ async function getExplanation(input: string, question: string) {
           content: 'false',
         },
       ],
-      temperature: 1,
-      max_tokens: 256,
+      temperature: 0,
+      max_tokens: 500,
       top_p: 1,
       frequency_penalty: 0,
       presence_penalty: 0,
