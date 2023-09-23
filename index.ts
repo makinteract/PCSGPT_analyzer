@@ -1,6 +1,6 @@
 // Constants
 const MAX_SIMULTANEOUS_QUERIES = 100;
-const PAUSE = 30 * 1000;
+const PAUSE = 60 * 1000;
 const PROMPT =
   'Is this paper discussing or using techniques based on artificial intelligence (AI), machine learning (ML), or large language models (LLMs)? Give a conservative answer to minimize false positives. Simply answer "true" or "false".';
 
